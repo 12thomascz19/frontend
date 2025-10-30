@@ -1,70 +1,76 @@
-# Getting Started with Create React App
+# 🎮 GameTracker — Frontend
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Bienvenido al **Frontend de GameTracker**, una aplicación web moderna donde los usuarios pueden **registrarse, iniciar sesión y gestionar sus propios videojuegos**.  
+Desarrollada con **React**, **TailwindCSS**, y conectada al backend de **Node.js + MongoDB**.
 
-## Available Scripts
+---
 
-In the project directory, you can run:
+## 🚀 Tecnologías utilizadas
 
-### `npm start`
+    | Tecnología | Descripción |
+    |-------------|-------------|
+    | ⚛️ **React.js** | Framework principal para el frontend |
+    | 🎨 **TailwindCSS** | Sistema de estilos rápido, moderno y responsive |
+    | 🌐 **Axios** | Cliente HTTP para conectar con el backend |
+    | 🔄 **React Router DOM** | Manejo de rutas y navegación SPA |
+    | 🧠 **LocalStorage** | Persistencia de sesión del usuario |
+    | 🧩 **React Icons** | Iconos profesionales y personalizables |
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+---
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## 🧱 Estructura del proyecto
 
-### `npm test`
+    frontend/
+    │
+    ├── src/
+    │ ├── api.js # Configuración de conexión al backend
+    │ ├── App.js # Rutas principales y navegación
+    │ │
+    │ ├── components/
+    │ │ ├── Navbar/ # Barra de navegación dinámica
+    │ │ │ └── Navbar.jsx
+    │ │ │
+    │ │ ├── Modals/ # Modales de autenticación
+    │ │ │ ├── LoginModal.jsx
+    │ │ │ └── RegisterModal.jsx
+    │ │ │
+    │ │ └── Juegos/ # Componentes de juegos del usuario
+    │ │ └── MisJuegos.jsx
+    │ │
+    │ ├── pages/
+    │ │ ├── BibliotecaJuegos.jsx
+    │ │ ├── Estadisticas.jsx
+    │ │ └── Cuenta.jsx # Página privada del usuario logueado
+    │ │
+    │ └── index.js # Punto de entrada React
+    │
+    ── package.json
+    
+---
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## 🎨 Paleta de colores — “GameTracker”
 
-### `npm run build`
+    | Rol | Color | HEX | Descripción |
+    |------|-------|-----|-------------|
+    | 🎯 Primario | Azul violeta gamer | `#6C63FF` | Botones, enlaces y bordes |
+    | ⚡ Secundario | Cian eléctrico | `#00E5FF` | Efectos y resaltes brillantes |
+    | 🕹️ Acento | Rosa neón | `#FF4081` | Alertas y logros |
+    | 🌑 Fondo | Azul oscuro | `#0A0A12` | Fondo general |
+    | 🧩 Paneles | Azul profundo | `#1A1A2E` | Tarjetas y secciones |
+    | ✨ Texto principal | Blanco | `#FFFFFF` | Títulos y texto visible |
+    | 💬 Texto secundario | Gris azulado | `#B0B3C2` | Etiquetas y subtítulos |
+    | 🔥 Éxito | Verde neón | `#00FF88` | Indicadores positivos |
+  | 💀 Error | Rojo neón | `#FF1744` | Mensajes de error |
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+---
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## ⚙️ Instalación y ejecución
+    npn install
+    npm run dev
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### 1️⃣ Clona el repositorio
+```bash
+git clone https://github.com/12thomascz19/frontend.git
+cd frontend
+└── tailwind.config.js
 
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
