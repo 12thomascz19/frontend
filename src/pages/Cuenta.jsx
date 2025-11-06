@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import API from "../services/api";
-import MisJuegos from "../components/Juegos/MisJuegos";
+import MisJuegos from "../components/Juegos/JuegoCard";
 
 const Cuenta = () => {
   const [usuario, setUsuario] = useState(null);
