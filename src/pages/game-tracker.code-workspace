@@ -1,0 +1,13 @@
+{
+  "folders": [
+	{
+		"name": "game-tracker",
+		"path": "../../.."
+	},
+	{
+		"name": "frontend-",
+		"path": "../../../../frontend-"
+	}
+],
+  "settings": {}
+}

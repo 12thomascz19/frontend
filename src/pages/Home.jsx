@@ -149,7 +149,8 @@ const Home = () => {
 
       {/* FOOTER */}
       <footer className="z-10 mt-20 text-[#B0B3C2] text-sm pb-10">
-        © 2025 Game Tracker | Desarrollado con 💜 por Thomas Cano Zapata
+        © 2025 GameTracker | Proyecto final para Jovenes CreaTIvos <br />
+                <span className="justify-center">desarrollado por Thomas Cano Zapata</span>
       </footer>
 
       {/* MODALES */}
