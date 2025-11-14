@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { FaFilter, FaPlusCircle, FaGamepad } from "react-icons/fa";
+import { FaFilter, FaPlusCircle, FaGamepad, FaSearch } from "react-icons/fa";
 import axios from "axios";
-import JuegoCard from "../components/Juegos/JuegoCard";
-import AgregarJuegoModal from "../components/Juegos/AgregarJuegoModal";
+import JuegoCard from "../../components/Juegos/JuegoCard";
+import AgregarJuegoModal from "../../components/Juegos/AgregarJuegoModal";
 
 const ExplorarJuegos = () => {
   const [juegos, setJuegos] = useState([]);
   const [categoria, setCategoria] = useState("todos");
+  const [genero, setGenero] = useState("todos");
   const [showModal, setShowModal] = useState(false);
+  const [busqueda, setBusqueda] = useState("");
 
   // Cargar juegos desde el backend
   const obtenerJuegos = async () => {
@@ -25,10 +27,16 @@ const ExplorarJuegos = () => {
   }, []);
 
   // Filtrado
-  const juegosFiltrados =
-    categoria === "todos"
-      ? juegos
-      : juegos.filter((juego) => juego.plataforma === categoria);
+
+  const juegosFiltrados = juegos.filter((juego) => {
+    const coincideTitulo = juego.titulo
+      ?.toLowerCase()
+      .includes(busqueda.toLowerCase());
+    const coincideGenero =
+      genero === "todos" ||
+      juego.genero?.toLowerCase() === genero.toLowerCase();
+    return coincideTitulo && coincideGenero;
+  });
 
   return (
     <div className="min-h-screen bg-[#0A0A12] text-white px-6 pt-28 pb-16">
@@ -43,6 +51,16 @@ const ExplorarJuegos = () => {
 
         {/* Filtros y botón */}
         <div className="flex items-center gap-4 mt-6 md:mt-0">
+          <div className="relative">
+            <FaSearch className="absolute left-3 top-3 text-[#6C63FF]" />
+            <input
+              type="text"
+              placeholder="Buscar por título..."
+              value={busqueda}
+              onChange={(e) => setBusqueda(e.target.value)}
+              className="bg-[#1A1A2E] border border-[#6C63FF60] rounded-lg pl-10 pr-4 py-2 text-sm"
+            />
+          </div>
           <div className="relative">
             <FaFilter className="absolute left-3 top-3 text-[#6C63FF]" />
             <select

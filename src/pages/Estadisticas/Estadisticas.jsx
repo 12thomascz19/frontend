@@ -24,17 +24,72 @@ const Estadisticas = () => {
     const fetchStats = async () => {
       try {
         const token = localStorage.getItem("token");
+
+        // Traemos juegos de la biblioteca del usuario
         const res = await axios.get(
-          "http://localhost:5000/api/estadisticas/mis-estadisticas",
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
+          "http://localhost:5000/api/juegos/mi-biblioteca",
+          { headers: { Authorization: `Bearer ${token}` } }
         );
-        setEstadisticas(res.data);
+
+        const data = res.data;
+        const juegos = Array.isArray(data)
+          ? data
+          : Array.isArray(data?.biblioteca)
+          ? data.biblioteca
+          : Array.isArray(data?.juegos)
+          ? data.juegos
+          : [];
+
+        // Métricas principales
+        const totalJuegos = juegos.length;
+        const completados = juegos.filter((j) => j.completado).length;
+        const porcentajeCompletados =
+          totalJuegos > 0 ? Math.round((completados / totalJuegos) * 100) : 0;
+
+        // Promedio de calificación (si el campo existe)
+        const calificaciones = juegos
+          .map((j) => Number(j.calificacion))
+          .filter((n) => !isNaN(n));
+        const promedioPuntuacion =
+          calificaciones.length > 0
+            ? calificaciones.reduce((a, b) => a + b, 0) / calificaciones.length
+            : 0;
+
+        // Distribuciones
+        const porPlataforma = juegos.reduce((acc, j) => {
+          const key = j.plataforma || "Desconocida";
+          acc[key] = (acc[key] || 0) + 1;
+          return acc;
+        }, {});
+
+        const porGenero = juegos.reduce((acc, j) => {
+          const key = j.genero || "Desconocido";
+          acc[key] = (acc[key] || 0) + 1;
+          return acc;
+        }, {});
+
+        setEstadisticas({
+          totalJuegos,
+          completados,
+          porcentajeCompletados,
+          promedioPuntuacion,
+          porPlataforma,
+          porGenero,
+        });
       } catch (error) {
-        console.error("Error al cargar estadísticas:", error);
+        console.error("Error al cargar estadísticas desde biblioteca:", error);
+        // Estado seguro para evitar crasheos en la UI
+        setEstadisticas({
+          totalJuegos: 0,
+          completados: 0,
+          porcentajeCompletados: 0,
+          promedioPuntuacion: 0,
+          porPlataforma: {},
+          porGenero: {},
+        });
       }
     };
+
     fetchStats();
   }, []);
 

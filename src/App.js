@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar/Navbar";
-import BibliotecaJuegos from "./pages/BibliotecaJuegos";
-import Estadisticas from "./pages/Estadisticas";
+import BibliotecaJuegos from "./pages/Biblioteca/BibliotecaJuegos";
+import Estadisticas from "./pages/Estadisticas/Estadisticas";
 import Home from "./pages/Home";
-import Cuenta from "./pages/Cuenta";
-import ExplorarJuegos from "./pages/ExplorarJuegos";
+import Cuenta from "./pages/Cuenta/Cuenta";
+import ExplorarJuegos from "./pages/ExplorarJuegos/ExplorarJuegos";
 
 // ✅ Importa los modales
 import LoginModal from "./components/Modals/LoginModal";
@@ -13,6 +13,8 @@ import RegisterModal from "./components/Modals/RegisterModal";
 
 // ✅ Importa react-hot-toast si usas toasts globales
 import { Toaster } from "react-hot-toast";
+import Reseñas from "./pages/Reseñas/Reseñas";
+import VerResenas from "./pages/VerReseñas/VerResenas";
 
 function App() {
   const [showLogin, setShowLogin] = useState(false);
@@ -48,8 +50,10 @@ function App() {
           <Route path="/" element={<Home usuario={usuario} />} />
           <Route path="/Explorar-juegos" element={<ExplorarJuegos />} />
           <Route path="/biblioteca" element={<BibliotecaJuegos />} />
+          <Route path="/resenas" element={<Reseñas />} />
           <Route path="/estadisticas" element={<Estadisticas />} />
           <Route path="/cuenta" element={<Cuenta />} />
+          <Route path="/ver-resenas" element={<VerResenas />} />
         </Routes>
 
         {/* ✅ Modales controlados por estado */}

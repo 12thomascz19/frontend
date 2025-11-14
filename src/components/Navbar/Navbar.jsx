@@ -88,6 +88,13 @@ const Navbar = ({
             <FaBookOpen />
             Mi Biblioteca
           </Link>
+          <Link
+            to="/resenas"
+            className="flex items-center gap-2 hover:text-[#00E5FF] transition-all"
+          >
+            <FaBookOpen />
+            Mis Reseñas
+          </Link>
 
           <Link
             to="/estadisticas"

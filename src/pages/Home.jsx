@@ -12,7 +12,7 @@ import {
 } from "react-icons/fa";
 import LoginModal from "../components/Modals/LoginModal";
 import RegisterModal from "../components/Modals/RegisterModal";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -93,16 +93,14 @@ const Home = () => {
           </>
         ) : (
           <div className="text-center">
-            <p className="text-[#00FF88] mb-3 text-lg font-semibold">
-              ¡Hola, {usuario?.nombre}! 😎
+            <p className="bg-blue-500/15 p-2 rounded text-[#ffffff] mb-3 text-lg font-semibold">
+              ¡Hola, {usuario?.nombre}!
             </p>
-            <motion.button
-              onClick={handleIrJuegos}
-              whileHover={{ scale: 1.1, boxShadow: "0 0 20px #6C63FF" }}
+              <Link to="/Explorar-juegos"
               className="flex items-center justify-center gap-2 mx-auto bg-[#6C63FF] hover:bg-[#7B72FF] px-8 py-3 rounded-lg font-semibold shadow-lg shadow-[#6C63FF]/50"
-            >
-              <FaRocket /> Ir a mis juegos
-            </motion.button>
+             >
+                <FaRocket /> Ir a mis juegos
+              </Link>
           </div>
         )}
       </motion.div>
@@ -117,17 +115,17 @@ const Home = () => {
         <FeatureCard
           icon={<FaChartBar className="text-[#00E5FF] text-4xl" />}
           title="Analiza tus estadísticas"
-          desc="Descubre cuánto juegas, tus géneros favoritos y tus logros globales. 📊"
+          desc="Descubre cuánto juegas, tus géneros favoritos y tus logros globales. "
         />
         <FeatureCard
           icon={<FaMedal className="text-[#FF4081] text-4xl" />}
-          title="Desbloquea logros"
-          desc="Gana insignias y trofeos únicos al completar tus metas personales. 🏆"
+          title="Publica tus reseñas"
+          desc="Publica reseñas y califica tus propios juegos. "
         />
         <FeatureCard
           icon={<FaLayerGroup className="text-[#6C63FF] text-4xl" />}
           title="Organiza tu colección"
-          desc="Guarda, clasifica y comparte tus juegos en una biblioteca personalizada. 🎮"
+          desc="Guarda, clasifica y comparte tus juegos en una biblioteca personalizada. "
         />
       </motion.div>
 
@@ -150,7 +148,9 @@ const Home = () => {
       {/* FOOTER */}
       <footer className="z-10 mt-20 text-[#B0B3C2] text-sm pb-10">
         © 2025 GameTracker | Proyecto final para Jovenes CreaTIvos <br />
-                <span className="justify-center">desarrollado por Thomas Cano Zapata</span>
+        <span className="justify-center">
+          desarrollado por Thomas Cano Zapata
+        </span>
       </footer>
 
       {/* MODALES */}

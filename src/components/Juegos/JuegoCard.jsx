@@ -14,7 +14,7 @@ import {
 } from "react-icons/fa";
 import toast from "react-hot-toast";
 import axios from "axios";
-import './AgregarJuegoModal.css';
+import "./AgregarJuegoModal.css";
 
 const JuegoCard = ({ juego }) => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -32,6 +32,7 @@ const JuegoCard = ({ juego }) => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // ✅ NUEVO: Agregar juego a la biblioteca del usuario
   const agregarABiblioteca = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -40,11 +41,24 @@ const JuegoCard = ({ juego }) => {
         return;
       }
 
-      await axios.post(
-        "http://localhost:5000/api/juegos",
-        { ...juego },
-        { headers: { Authorization: `Bearer ${token}` } }
+      // 🔍 DIAGNÓSTICO: Verificar datos antes de enviar
+      console.log("🔍 DIAGNÓSTICO - Datos a enviar:");
+      console.log("- Token presente:", !!token);
+      console.log("- ID del juego:", juego._id);
+      console.log("- URL de la petición:", `http://localhost:5000/api/juegos/agregar-a-biblioteca/${juego._id}`);
+      
+      const response = await axios.post(
+        `http://localhost:5000/api/juegos/agregar-a-biblioteca/${juego._id}`,
+        {},
+        { 
+          headers: { 
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          } 
+        }
       );
+
+      console.log("✅ Respuesta exitosa del servidor:", response.data);
 
       toast.success("Juego agregado a tu biblioteca ✅", {
         style: {
@@ -57,8 +71,35 @@ const JuegoCard = ({ juego }) => {
         icon: "🎮",
       });
     } catch (error) {
-      console.error("Error al agregar juego:", error);
-      toast.error("No se pudo agregar el juego 😢");
+      console.error("❌ ERROR COMPLETO AL AGREGAR JUEGO:");
+      console.error("📋 Detalles del error:");
+      console.error("- Mensaje:", error.message);
+      console.error("- Estado HTTP:", error.response?.status);
+      console.error("- Datos del error:", error.response?.data);
+      console.error("- Headers:", error.response?.headers);
+      console.error("- Config de la petición:", error.config);
+      
+      // Mostrar mensaje de error más específico
+      const mensajeError = error.response?.data?.message || "No se pudo agregar el juego 😢";
+      const estadoError = error.response?.status;
+      
+      let mensajeParaUsuario = mensajeError;
+      if (estadoError === 500) {
+        mensajeParaUsuario = "Error del servidor. Por favor, intenta más tarde.";
+      } else if (estadoError === 401) {
+        mensajeParaUsuario = "Sesión expirada. Por favor, inicia sesión nuevamente.";
+      }
+      
+      toast.error(mensajeParaUsuario, {
+        duration: 6000,
+        style: {
+          background: "#0A0A12",
+          color: "#FF1744",
+          border: "1px solid #FF1744",
+          boxShadow: "0 0 15px #FF174480",
+          fontWeight: "600",
+        },
+      });
     } finally {
       setMenuOpen(false);
     }
@@ -70,7 +111,7 @@ const JuegoCard = ({ juego }) => {
       <FaStar
         key={i}
         className={`${
-          i < puntuacion ? "text-yellow-400" : "text-gray-600"
+          i < (juego.puntuacion || 0) ? "text-yellow-400" : "text-gray-600"
         } text-lg drop-shadow-[0_0_4px_#00000060]`}
       />
     ));
@@ -157,10 +198,10 @@ const JuegoCard = ({ juego }) => {
             <div>
               <h3 className="text-xl font-bold text-[#00E5FF] drop-shadow-[0_0_8px_#000]">
                 {juego.titulo}
-              </h3>
               <p className="text-sm text-gray-300 max-w-[250px]">
-                {juego.descripcion?.slice(0, 60)}...
+                {juego.descripcion}
               </p>
+              </h3>
             </div>
             <button
               onClick={(e) => {
@@ -193,7 +234,9 @@ const JuegoCard = ({ juego }) => {
               </h3>
 
               {/* Puntuación */}
-              <div className="flex gap-1 mb-3">{renderStars(juego.valoracion)}</div>
+              <div className="flex gap-1 mb-3">
+                {renderStars(juego.puntuacion)}
+              </div>
 
               <div className="space-y-3 text-sm">
                 <div className="flex items-center gap-3 bg-[#1A1A2E]/80 p-2 rounded-md border border-[#6C63FF30]">
@@ -206,7 +249,7 @@ const JuegoCard = ({ juego }) => {
                 <div className="flex items-center gap-3 bg-[#1A1A2E]/80 p-2 rounded-md border border-[#6C63FF30]">
                   <FaCalendarAlt className="text-[#00E5FF]" />
                   <span>
-                    <strong>Año de lanzamiento:</strong> {juego.anioLanzamiento}
+                    <strong>Año de lanzamiento:</strong> {juego.añoLanzamiento}
                   </span>
                 </div>
 
