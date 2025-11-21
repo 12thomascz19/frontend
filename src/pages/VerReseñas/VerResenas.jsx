@@ -10,6 +10,7 @@ import {
 import axios from "axios";
 import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
+import Footer from "../../components/Footer/Footer";
 
 const VerResenas = () => {
   const [resenas, setResenas] = useState([]);
@@ -237,6 +238,7 @@ const VerResenas = () => {
           ))}
         </div>
       )}
+      <Footer/>
     </div>
   );
 };

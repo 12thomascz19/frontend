@@ -4,6 +4,7 @@ import { FaCommentDots, FaEye, FaStar } from "react-icons/fa";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
+import Footer from "../../components/Footer/Footer";
 
 const Reseñas = () => {
   const [vista, setVista] = useState("comentar"); // comentar | ver
@@ -204,6 +205,7 @@ const Reseñas = () => {
 
         {/* 🔹 Vista: Ver reseñas */}
       </AnimatePresence>
+      <Footer/>
     </div>
   );
 };

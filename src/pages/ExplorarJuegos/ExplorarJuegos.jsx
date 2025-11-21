@@ -4,6 +4,7 @@ import { FaFilter, FaPlusCircle, FaGamepad, FaSearch } from "react-icons/fa";
 import axios from "axios";
 import JuegoCard from "../../components/Juegos/JuegoCard";
 import AgregarJuegoModal from "../../components/Juegos/AgregarJuegoModal";
+import Footer from "../../components/Footer/Footer";
 
 const ExplorarJuegos = () => {
   const [juegos, setJuegos] = useState([]);
@@ -113,6 +114,7 @@ const ExplorarJuegos = () => {
           onAdd={obtenerJuegos}
         />
       )}
+      <Footer/>
     </div>
   );
 };

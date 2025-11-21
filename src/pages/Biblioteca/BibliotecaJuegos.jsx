@@ -5,6 +5,8 @@ import { FaSearch, FaFilter, FaGamepad, FaPlus } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import CardBiblioteca from "../../components/Biblioteca/CardBiblioteca";
+import JuegoCard from "../../components/Juegos/JuegoCard";
+import Footer from "../../components/Footer/Footer";
 
 const BibliotecaJuegos = () => {
   const [juegos, setJuegos] = useState([]);
@@ -274,7 +276,7 @@ const BibliotecaJuegos = () => {
           transition={{ duration: 0.5 }}
         >
           {juegosFiltrados.map((juego) => (
-            <CardBiblioteca
+            <JuegoCard
               key={juego._id}
               juego={juego}
               toggleCompletado={toggleCompletado}
@@ -284,6 +286,8 @@ const BibliotecaJuegos = () => {
           ))}
         </motion.div>
       )}
+
+      <Footer/>
     </div>
   );
 };

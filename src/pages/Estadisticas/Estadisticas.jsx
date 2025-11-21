@@ -14,6 +14,7 @@ import {
 } from "recharts";
 import { motion } from "framer-motion";
 import { FaChartBar, FaGamepad, FaTrophy, FaStar } from "react-icons/fa";
+import Footer from "../../components/Footer/Footer";
 
 const COLORS = ["#6C63FF", "#00E5FF", "#FF4081", "#00FF88", "#FF1744"];
 
@@ -221,6 +222,7 @@ const Estadisticas = () => {
           </ResponsiveContainer>
         </div>
       </div>
+      <Footer/>
     </div>
   );
 };

@@ -17,6 +17,7 @@ import {
 } from "react-icons/fa";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
+import Footer from "../../components/Footer/Footer";
 
 const Cuenta = () => {
   const [usuario, setUsuario] = useState({});
@@ -180,6 +181,7 @@ const Cuenta = () => {
           </div>
         </div>
       </motion.div>
+      <Footer/>
     </div>
   );
 };

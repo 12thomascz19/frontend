@@ -13,6 +13,7 @@ import {
 import LoginModal from "../components/Modals/LoginModal";
 import RegisterModal from "../components/Modals/RegisterModal";
 import { useNavigate, Link } from "react-router-dom";
+import Footer from "../components/Footer/Footer";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -58,7 +59,7 @@ const Home = () => {
           <FaGamepad className="text-[#6C63FF] text-8xl drop-shadow-[0_0_25px_#6C63FF]" />
         </motion.div>
         <h1 className="text-6xl font-extrabold text-[#00E5FF] mt-4 tracking-wide drop-shadow-[0_0_12px_#00E5FF]">
-          Game Tracker
+          GameTracker
         </h1>
         <p className="text-[#B0B3C2] mt-4 text-lg max-w-2xl leading-relaxed">
           Tu portal gamer definitivo ⚡ Administra tu biblioteca de juegos,
@@ -145,13 +146,7 @@ const Home = () => {
         </motion.button>
       </motion.div>
 
-      {/* FOOTER */}
-      <footer className="z-10 mt-20 text-[#B0B3C2] text-sm pb-10">
-        © 2025 GameTracker | Proyecto final para Jovenes CreaTIvos <br />
-        <span className="justify-center">
-          desarrollado por Thomas Cano Zapata
-        </span>
-      </footer>
+        <Footer/>
 
       {/* MODALES */}
       {showLogin && <LoginModal onClose={() => setShowLogin(false)} />}
