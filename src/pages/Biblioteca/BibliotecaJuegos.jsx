@@ -287,7 +287,9 @@ const BibliotecaJuegos = () => {
         </motion.div>
       )}
 
-      <Footer/>
+      <footer className="mt-20 pt-12 pb-10 text-sm border-t w-full">
+        <Footer />
+      </footer>
     </div>
   );
 };

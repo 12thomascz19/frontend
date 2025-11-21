@@ -1,244 +1,294 @@
-import React, { useEffect, useState, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import {
-  FaEllipsisV,
-  FaTrash,
-  FaEdit,
-  FaClock,
-  FaSearch,
-} from "react-icons/fa";
+// src/pages/Resenas/VerResenas.jsx
+import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { Link } from "react-router-dom";
-import toast from "react-hot-toast";
+import { motion } from "framer-motion";
+import {
+  FaStar,
+  FaClock,
+  FaGamepad,
+  FaThumbsUp,
+  FaThumbsDown,
+  FaEllipsisV,
+} from "react-icons/fa";
 import Footer from "../../components/Footer/Footer";
+import VerJuego from "../../components/Modals/VerJuego/VerJuego";
+
+const coverPlaceholder = "/mnt/data/461eccd0-222d-4ac0-9950-adf5fbc639bb.png";
 
 const VerResenas = () => {
-  const [resenas, setResenas] = useState([]);
-  const [usuarioActual, setUsuarioActual] = useState(null);
-  const [menuActivo, setMenuActivo] = useState(null);
-  const dropdownRef = useRef(null);
-  const [vista, setVista] = useState("comentar"); // comentar | ver
+  const [reseñas, setReseñas] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [opcionesAbiertas, setOpcionesAbiertas] = useState(null); // ID de reseña que tiene menú abierto
+
+  const [q, setQ] = useState(""); // búsqueda por texto o título
+  const [filtroDificultad, setFiltroDificultad] = useState("todos");
+  const [filtroRecomendadas, setFiltroRecomendadas] = useState("todas"); // todas | si | no
+  const [selectedGame, setSelectedGame] = useState(null);
+  const [openGameId, setOpenGameId] = useState(null);
 
   useEffect(() => {
-    obtenerResenas();
-    const usuario = JSON.parse(localStorage.getItem("usuario"));
-    if (usuario) setUsuarioActual(usuario);
-  }, []);
-
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
-        setMenuActivo(null);
+    const fetchResenas = async () => {
+      try {
+        setLoading(true);
+        const res = await axios.get("http://localhost:5000/api/resenas");
+        // se espera un array de reseñas con la estructura del esquema
+        setReseñas(Array.isArray(res.data) ? res.data : []);
+      } catch (err) {
+        console.error("Error cargando reseñas:", err);
+        setReseñas([]);
+      } finally {
+        setLoading(false);
       }
     };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    fetchResenas();
   }, []);
 
-  const obtenerResenas = async () => {
-    try {
-      const res = await axios.get("http://localhost:5000/api/resenas");
-      setResenas(Array.isArray(res.data) ? res.data : []);
-    } catch (error) {
-      console.error("Error al obtener reseñas:", error);
-      toast.error("No se pudieron cargar las reseñas 😢");
-    }
-  };
+  // filtrado y búsqueda
+  const filtradas = reseñas
+    .filter((r) => {
+      if (!r) return false;
+      // filtro por dificultad
+      if (
+        filtroDificultad !== "todos" &&
+        (r.dificultad || "").toLowerCase() !== filtroDificultad.toLowerCase()
+      ) {
+        return false;
+      }
+      // filtro por recomendacion
+      if (filtroRecomendadas === "si" && r.recomendaria !== true) return false;
+      if (filtroRecomendadas === "no" && r.recomendaria !== false) return false;
+      // búsqueda por texto de reseña o título del juego (si viene como objeto o cadena)
+      const texto = (
+        (r.textoReseña || "") +
+        " " +
+        (r.juegoTitulo || r.juego?.titulo || "")
+      ).toLowerCase();
+      if (q && !texto.includes(q.toLowerCase())) return false;
+      return true;
+    })
+    .sort(
+      (a, b) =>
+        new Date(b.fechaCreacion || b.createdAt || 0) -
+        new Date(a.fechaCreacion || a.createdAt || 0)
+    );
 
-  const eliminarResena = async (resenaId) => {
-    const token = localStorage.getItem("token");
-
-    if (!window.confirm("¿Seguro que deseas eliminar esta reseña?")) return;
-
-    try {
-      const res = await axios.delete(
-        `http://localhost:5000/api/resenas/${resenaId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      toast.success("Reseña eliminada correctamente");
-      obtenerResenas();
-    } catch (error) {
-      console.log("ERROR AL ELIMINAR:", error);
-
-      const msg =
-        error.response?.data?.message ||
-        error.response?.data?.msg ||
-        "Error desconocido";
-
-      toast.error("Error al eliminar reseña: " + msg);
-    }
-  };
-
-  const editarResena = (resena) => {
-    toast("Función de edición próximamente ✏️", {
-      style: {
-        background: "#1A1A2E",
-        color: "#fff",
-        border: "1px solid #6C63FF",
-      },
-    });
+  const onOpciones = (reseña) => {
+    setOpcionesAbiertas((prev) => (prev === reseña._id ? null : reseña._id));
   };
 
   return (
-    <div className="min-h-screen bg-[#0A0A12] text-white pt-24 pb-16 px-6">
-      <div className="flex items-center justify-between mb-10">
-        <div className="flex flex-col md:flex-row justify-between items-center mb-10">
-          <h1 className="text-3xl font-bold text-[#00E5FF] tracking-wide">
-            Reseñas de mis juegos
-          </h1>
+    <div className="min-h-screen bg-[#0A0A12] text-white pt-28 pb-20 px-4 sm:px-6 lg:px-12">
+      {/* Encabezado y filtros */}
+      <div className="max-w-7xl mx-auto mb-8">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div>
+            <h1 className="text-3xl sm:text-4xl font-extrabold text-[#00E5FF] tracking-wide drop-shadow-[0_0_12px_#00E5FF]">
+              Reseñas públicas
+            </h1>
+            <p className="text-[#B0B3C2] mt-2">
+              Lee lo que otros usuarios opinan o explora reseñas por juego,
+              puntuación o dificultad.
+            </p>
+          </div>
+
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+            <input
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              placeholder="Buscar por juego o contenido..."
+              className="bg-[#1A1A2E] border border-[#6C63FF40] rounded-lg px-4 py-2 text-sm w-full sm:w-64"
+            />
+
+            <select
+              value={filtroDificultad}
+              onChange={(e) => setFiltroDificultad(e.target.value)}
+              className="bg-[#1A1A2E] border border-[#6C63FF40] rounded-lg px-3 py-2 text-sm"
+            >
+              <option value="todos">Todas las dificultades</option>
+              <option value="Fácil">Fácil</option>
+              <option value="Normal">Normal</option>
+              <option value="Difícil">Difícil</option>
+            </select>
+
+            <select
+              value={filtroRecomendadas}
+              onChange={(e) => setFiltroRecomendadas(e.target.value)}
+              className="bg-[#1A1A2E] border border-[#6C63FF40] rounded-lg px-3 py-2 text-sm"
+            >
+              <option value="todas">Todas</option>
+              <option value="si">Recomendadas</option>
+              <option value="no">No recomendadas</option>
+            </select>
+          </div>
         </div>
       </div>
-      <div className="flex gap-3 mt-4 md:mt-0">
-        <Link
-          to="/resenas"
-          onClick={() => setVista("comentar")}
-          className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
-            vista === "comentar"
-              ? "bg-[#6C63FF] text-white shadow-[0_0_12px_#6C63FF80]"
-              : "bg-[#1E1E2E] text-gray-300 hover:bg-[#2C2C3A]"
-          }`}
-        >
-          Comentar reseñas
-        </Link>
-        <Link
-          to="/ver-resenas"
-          onClick={() => setVista("comentar")}
-          className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
-            vista === "ver"
-              ? "bg-[#00E5FF] text-black shadow-[0_0_12px_#00E5FF80]"
-              : "bg-[#1E1E2E] text-gray-300 hover:bg-[#2C2C3A]"
-          }`}
-        >
-          Ver reseñas
-        </Link>
-      </div>
 
-      {resenas.length === 0 ? (
-        <p className="text-center text-[#B0B3C2] mt-20">
-          No hay reseñas aún. ¡Sé el primero en dejar una opinión! 🎮
-        </p>
-      ) : (
-        <div className="flex sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          {resenas.map((resena) => (
-            <motion.div
-              key={resena._id}
-              initial={{ opacity: 0, y: 20 }}
+      {/* Grid de tarjetas */}
+      <div className="flex gap-10 max-w-7xl mx-auto">
+        {filtradas.map((r) => {
+          const user = JSON.parse(localStorage.getItem("user"));
+
+          // Obtener ID y nombre del autor de la reseña
+          const autorId =
+            r.autor?._id || r.usuario?._id || r.usuarioId || r.userId || null;
+
+          const autorNombre =
+            r.autor?.nombre ||
+            r.usuario?.nombre ||
+            r.usuarioNombre ||
+            r.userName ||
+            "Anónimo";
+
+          const soyYo = user?.id === autorId;
+
+          return (
+            <motion.article
+              key={r._id || Math.random()}
+              initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
-              className="relative bg-[#121224] rounded-2xl border border-[#6C63FF40] shadow-[0_0_15px_#00E5FF40] overflow-hidden"
+              whileHover={{
+                translateY: -6,
+                boxShadow: "0 8px 30px rgba(108,99,255,0.12)",
+              }}
+              transition={{ duration: 0.25 }}
+              className="relative bg-[#0D0D14] rounded-2xl border border-[#2A2A3E] overflow-hidden"
             >
-              {/* Imagen del juego */}
-              <img
-                src={
-                  resena.juego?.imagenPortada ||
-                  "https://via.placeholder.com/400x400?text=Juego"
-                }
-                alt={resena.juego?.titulo || "Juego"}
-                className="w-full h-40 object-cover"
-              />
+              {/* botón 3 puntos — solo si soy yo */}
+              {soyYo && (
+                <div className="absolute top-3 right-3 text-gray-300 hover:text-white cursor-pointer z-10">
+                  <FaEllipsisV onClick={() => onOpciones(r)} />
+                </div>
+              )}
+              {soyYo && opcionesAbiertas === r._id && (
+                <div className="absolute top-10 right-3 bg-[#14141F] border border-[#2A2A3E] rounded-lg shadow-lg w-32 z-20">
+                  <button
+                    onClick={() => alert("Editar reseña")}
+                    className="w-full text-left px-3 py-2 text-sm hover:bg-[#1F1F2E]"
+                  >
+                    ✏️ Editar
+                  </button>
 
-              {/* Contenido */}
-              <div className="p-5 relative">
-                {/* Header usuario */}
-                <div
-                  className="flex items-center justify-between"
-                  ref={dropdownRef}
-                >
-                  <div className="flex items-center gap-3">
-                    <img
-                      src={
-                        resena.usuario?.fotoPerfil ||
-                        "https://cdn-icons-png.flaticon.com/512/149/149071.png"
-                      }
-                      alt="Usuario"
-                      className="w-10 h-10 rounded-full border-2 border-[#6C63FF]"
-                    />
-                    <div>
-                      <h3 className="font-semibold text-[#00E5FF]">
-                        {resena.usuario?.nombre || "Usuario desconocido"}
-                        {usuarioActual &&
-                          usuarioActual.id === resena.usuario?._id && (
-                            <span className="ml-2 text-xs bg-[#00FF88]/20 text-[#00FF88] px-2 py-1 rounded-full">
-                              Mi reseña
-                            </span>
-                          )}
-                      </h3>
-                      <p className="text-xs text-gray-400 flex items-center gap-1">
-                        <FaClock />{" "}
-                        {new Date(resena.fechaCreacion).toLocaleString(
-                          "es-CO",
-                          {
-                            dateStyle: "medium",
-                            timeStyle: "short",
-                          }
-                        )}
-                      </p>
-                    </div>
+                  <button
+                    onClick={() => alert("Eliminar reseña")}
+                    className="w-full text-left px-3 py-2 text-sm hover:bg-[#1F1F2E] text-red-400"
+                  >
+                    🗑 Eliminar
+                  </button>
+                </div>
+              )}
+
+              {/* imagen */}
+              <div className="h-36 w-full bg-gradient-to-r from-[#17172A] to-[#0B1020] flex items-center justify-center">
+                <img
+                  src={
+                    r.imagenPortada ||
+                    r.juego?.imagenPortada ||
+                    r.coverUrl ||
+                    coverPlaceholder
+                  }
+                  alt={r.juego?.titulo || r.juegoTitulo || "Juego"}
+                  className="h-28 object-cover rounded-lg shadow-[0_0_15px_#00E5FF40] border border-[#00E5FF20]"
+                />
+              </div>
+
+              {/* contenido */}
+              <div className="p-4 flex flex-col gap-3">
+                {/* título + autor + fecha */}
+                <div className="flex items-start justify-between gap-2">
+                  <div>
+                    <h3 className="text-lg font-bold text-[#00E5FF]">
+                      {r.juego?.titulo || r.juegoTitulo || "Título desconocido"}
+                    </h3>
+
+                    <p className="text-xs text-[#B0B3C2]">
+                      {/* Nombre autor */}
+                      <strong className="text-white">
+                        {autorNombre}{" "}
+                        
+                       
+                      </strong>{" "}
+                      •{" "}
+                      {new Date(
+                        r.fechaCreacion || r.createdAt || Date.now()
+                      ).toLocaleDateString()}
+                    </p>
                   </div>
 
-                  {/* Menú de opciones (solo si es del usuario actual) */}
-                  {usuarioActual &&
-                    usuarioActual.id === resena.usuario?._id && (
-                      <div className="relative">
-                        <button
-                          onClick={() =>
-                            setMenuActivo(
-                              menuActivo === resena._id ? null : resena._id
-                            )
-                          }
-                          className="p-2 rounded-full hover:bg-[#6C63FF]/30 transition-all"
-                        >
-                          <FaEllipsisV />
-                        </button>
-
-                        <AnimatePresence>
-                          {menuActivo === resena._id && (
-                            <motion.div
-                              initial={{ opacity: 0, y: -10 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              exit={{ opacity: 0, y: -10 }}
-                              transition={{ duration: 0.2 }}
-                              className="absolute right-0 top-10 w-40 bg-[#1E1E2E] border border-[#6C63FF60] rounded-xl shadow-xl overflow-hidden z-50"
-                            >
-                              <button
-                                onClick={() => editarResena(resena)}
-                                className="flex items-center gap-2 w-full px-4 py-2 hover:bg-[#6C63FF]/30 text-left"
-                              >
-                                <FaEdit /> Editar
-                              </button>
-                              <button
-                                onClick={() => eliminarResena(resena._id)}
-                                className="flex items-center gap-2 w-full px-4 py-2 text-red-400 hover:text-red-500"
-                              >
-                                <FaTrash /> Eliminar
-                              </button>
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
-                      </div>
-                    )}
+                  {/* puntuación */}
+                  <div className="flex items-center gap-1">
+                    {Array.from({ length: 5 }).map((_, i) => {
+                      const filled = i < (r.puntuacion || 0);
+                      return (
+                        <FaStar
+                          key={i}
+                          className={`text-sm ${
+                            filled ? "text-yellow-400" : "text-gray-600"
+                          }`}
+                        />
+                      );
+                    })}
+                  </div>
                 </div>
 
-                {/* Título del juego reseñado */}
-                <h2 className="text-lg font-bold text-[#00FF88] mt-4">
-                  🎮 {resena.juego?.titulo || "Juego sin título"}
-                </h2>
-
-                {/* Contenido reseña */}
-                <p className="mt-3 text-sm text-gray-300 leading-relaxed">
-                  {resena.contenido || "Sin texto de reseña."}
+                {/* comentario */}
+                <p className="text-sm text-[#E0E0F0] leading-relaxed line-clamp-5">
+                  {r.textoReseña}
                 </p>
+
+                {/* tags */}
+                <div className="flex flex-wrap items-center gap-2 mt-2">
+                  <span className="flex items-center gap-2 bg-[#11121A] text-[#B0B3C2] px-3 py-1 rounded-full text-xs border border-[#6C63FF20]">
+                    <FaClock className="text-[#6C63FF]" />
+                    {r.horasJugadas ?? "—"} h
+                  </span>
+
+                  <span className="flex items-center gap-2 bg-[#11121A] text-[#B0B3C2] px-3 py-1 rounded-full text-xs border border-[#6C63FF20]">
+                    <FaGamepad className="text-[#00E5FF]" />
+                    {r.dificultad || "Desconocida"}
+                  </span>
+
+                  <span
+                    className={`flex items-center gap-2 px-3 py-1 rounded-full text-xs ${
+                      r.recomendaria
+                        ? "bg-[#00E5FF] text-black"
+                        : "bg-[#1A1A2E] text-[#B0B3C2] border border-[#FF1744]/20"
+                    }`}
+                  >
+                    {r.recomendaria ? <FaThumbsUp /> : <FaThumbsDown />}
+                    {r.recomendaria ? "La recomiendo" : "No la recomiendo"}
+                  </span>
+                </div>
+
+                {/* acciones */}
+                <div className="mt-3 flex items-center justify-between">
+                  <span className="text-xs text-[#99A0B5]">
+                    {r.fechaActualizacion
+                      ? `Actualizado ${new Date(
+                          r.fechaActualizacion
+                        ).toLocaleDateString()}`
+                      : ""}
+                  </span>
+
+                  <button
+                    onClick={() => {
+                      const juegoId = r.juego?._id || r.juegoId;
+                      if (juegoId) window.location.href = `/juego/${juegoId}`;
+                    }}
+                    className="text-sm text-[#00E5FF] font-semibold hover:underline"
+                  >
+                    Ver juego
+                  </button>
+                </div>
               </div>
-            </motion.div>
-          ))}
-        </div>
-      )}
-      <Footer/>
+            </motion.article>
+          );
+        })}
+      </div>
+
+      {/* Modal estilo Amazon */}
+      <VerJuego gameId={openGameId} onClose={() => setOpenGameId(null)} />
+
+      <Footer />
     </div>
   );
 };

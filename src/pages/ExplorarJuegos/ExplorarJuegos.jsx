@@ -28,7 +28,6 @@ const ExplorarJuegos = () => {
   }, []);
 
   // Filtrado
-
   const juegosFiltrados = juegos.filter((juego) => {
     const coincideTitulo = juego.titulo
       ?.toLowerCase()
@@ -40,9 +39,9 @@ const ExplorarJuegos = () => {
   });
 
   return (
-    <div className="min-h-screen bg-[#0A0A12] text-white px-6 pt-28 pb-16">
+    <div className="min-h-screen bg-[#0A0A12] text-white px-4 sm:px-6 pt-28 pb-20">
       {/* Encabezado */}
-      <div className="flex flex-col md:flex-row justify-between items-center mb-10">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-10">
         <div className="flex items-center gap-3">
           <FaGamepad className="text-[#6C63FF] text-4xl drop-shadow-[0_0_10px_#6C63FF]" />
           <h1 className="text-3xl font-extrabold text-[#00E5FF] tracking-wide">
@@ -51,21 +50,24 @@ const ExplorarJuegos = () => {
         </div>
 
         {/* Filtros y botón */}
-        <div className="flex items-center gap-4 mt-6 md:mt-0">
-          <div className="relative">
+        <div className="flex flex-col sm:flex-row flex-wrap items-center gap-4 w-full md:w-auto">
+          {/* Buscador */}
+          <div className="relative w-full sm:w-auto">
             <FaSearch className="absolute left-3 top-3 text-[#6C63FF]" />
             <input
               type="text"
               placeholder="Buscar por título..."
               value={busqueda}
               onChange={(e) => setBusqueda(e.target.value)}
-              className="bg-[#1A1A2E] border border-[#6C63FF60] rounded-lg pl-10 pr-4 py-2 text-sm"
+              className="bg-[#1A1A2E] border border-[#6C63FF60] rounded-lg w-full sm:w-48 md:w-56 pl-10 pr-4 py-2 text-sm"
             />
           </div>
-          <div className="relative">
+
+          {/* Categoría */}
+          <div className="relative w-full sm:w-auto">
             <FaFilter className="absolute left-3 top-3 text-[#6C63FF]" />
             <select
-              className="bg-[#1A1A2E] border border-[#6C63FF60] rounded-lg pl-10 pr-4 py-2 text-sm focus:outline-none focus:border-[#00E5FF] transition-all"
+              className="bg-[#1A1A2E] border border-[#6C63FF60] rounded-lg w-full sm:w-48 md:w-56 pl-10 pr-4 py-2 text-sm focus:outline-none focus:border-[#00E5FF] transition-all"
               value={categoria}
               onChange={(e) => setCategoria(e.target.value)}
             >
@@ -78,10 +80,11 @@ const ExplorarJuegos = () => {
             </select>
           </div>
 
+          {/* Botón agregar */}
           <motion.button
             whileHover={{ scale: 1.05 }}
             onClick={() => setShowModal(true)}
-            className="flex items-center gap-2 bg-gradient-to-r from-[#6C63FF] to-[#00E5FF] px-5 py-2 rounded-lg font-semibold shadow-[0_0_15px_#6C63FF80] hover:shadow-[0_0_25px_#00E5FF80] transition-all"
+            className="flex items-center justify-center gap-2 bg-gradient-to-r from-[#6C63FF] to-[#00E5FF] w-full sm:w-auto px-5 py-2 rounded-lg font-semibold shadow-[0_0_15px_#6C63FF80] hover:shadow-[0_0_25px_#00E5FF80] transition-all"
           >
             <FaPlusCircle />
             Agregar juego
@@ -96,7 +99,15 @@ const ExplorarJuegos = () => {
         </p>
       ) : (
         <motion.div
-          className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8"
+          className="
+            grid 
+            grid-cols-1
+            xs:grid-cols-2 
+            sm:grid-cols-2 
+            md:grid-cols-3  
+            lg:grid-cols-4 
+            gap-8
+          "
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5 }}
@@ -107,14 +118,15 @@ const ExplorarJuegos = () => {
         </motion.div>
       )}
 
-      {/* Modal de agregar */}
+      {/* Modal */}
       {showModal && (
         <AgregarJuegoModal
           onClose={() => setShowModal(false)}
           onAdd={obtenerJuegos}
         />
       )}
-      <Footer/>
+
+      <Footer />
     </div>
   );
 };

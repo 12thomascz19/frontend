@@ -44,16 +44,16 @@ const Footer = () => {
           </h2>
 
           <div className="flex gap-4 text-xl mt-2 ">
-            <a href="https://github.com/12thomascz19" className="hover:text-white transition" target="_blank">
+            <a href="https://github.com/12thomascz19" className="hover:text-white transition">
               <FaGithub />
             </a>
-            <a href="https://facebook.com/Thomas Zapata" className="hover:text-white transition">
+            <a href="https://www.facebook.com/thomas.cano.7161/" className="hover:text-white transition">
               <FaFacebook />
             </a>
-            <a href="https://instagram.com/" className="hover:text-white transition">
+            <a href="https://www.instagram.com/thomas_zapata12/" className="hover:text-white transition">
               <FaInstagram />
             </a>
-            <a href="#" className="hover:text-white transition">
+            <a href="mailto:thomascanozapata571@gmail.com" className="hover:text-white transition">
               <FaEnvelope />
             </a>
           </div>

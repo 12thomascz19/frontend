@@ -26,7 +26,6 @@ const Estadisticas = () => {
       try {
         const token = localStorage.getItem("token");
 
-        // Traemos juegos de la biblioteca del usuario
         const res = await axios.get(
           "http://localhost:5000/api/juegos/mi-biblioteca",
           { headers: { Authorization: `Bearer ${token}` } }
@@ -41,22 +40,20 @@ const Estadisticas = () => {
           ? data.juegos
           : [];
 
-        // Métricas principales
         const totalJuegos = juegos.length;
         const completados = juegos.filter((j) => j.completado).length;
         const porcentajeCompletados =
           totalJuegos > 0 ? Math.round((completados / totalJuegos) * 100) : 0;
 
-        // Promedio de calificación (si el campo existe)
         const calificaciones = juegos
           .map((j) => Number(j.calificacion))
           .filter((n) => !isNaN(n));
+
         const promedioPuntuacion =
           calificaciones.length > 0
             ? calificaciones.reduce((a, b) => a + b, 0) / calificaciones.length
             : 0;
 
-        // Distribuciones
         const porPlataforma = juegos.reduce((acc, j) => {
           const key = j.plataforma || "Desconocida";
           acc[key] = (acc[key] || 0) + 1;
@@ -78,8 +75,6 @@ const Estadisticas = () => {
           porGenero,
         });
       } catch (error) {
-        console.error("Error al cargar estadísticas desde biblioteca:", error);
-        // Estado seguro para evitar crasheos en la UI
         setEstadisticas({
           totalJuegos: 0,
           completados: 0,
@@ -96,122 +91,91 @@ const Estadisticas = () => {
 
   if (!estadisticas) {
     return (
-      <div className="min-h-screen bg-[#0A0A12] text-white flex justify-center items-center">
+      <div className="min-h-screen bg-[#0A0A12] text-white flex justify-center items-center px-4">
         <div className="text-center text-[#B0B3C2] animate-pulse">
-          No hay estadisticas que mostrar{" "}
+          No hay estadísticas que mostrar
         </div>
       </div>
     );
   }
 
   const plataformasData = Object.entries(estadisticas.porPlataforma).map(
-    ([key, value]) => ({
-      name: key,
-      value,
-    })
+    ([name, value]) => ({ name, value })
   );
 
   const generosData = Object.entries(estadisticas.porGenero).map(
-    ([key, value]) => ({
-      name: key,
-      value,
-    })
+    ([name, value]) => ({ name, value })
   );
 
   return (
-    <div className="min-h-screen bg-[#0A0A12] text-white pt-28 px-8 pb-20">
+    <div className="min-h-screen bg-[#0A0A12] text-white pt-28 px-4 sm:px-8 pb-20">
       {/* ENCABEZADO */}
       <motion.div
-        className="flex items-center gap-4 mb-10"
+        className="flex flex-col sm:flex-row sm:items-center sm:gap-4 mb-10"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
       >
         <FaChartBar className="text-[#6C63FF] text-4xl drop-shadow-[0_0_12px_#6C63FF]" />
-        <h1 className="text-3xl font-extrabold text-[#00E5FF]">
+        <h1 className="text-3xl sm:text-4xl font-extrabold text-[#00E5FF] mt-2 sm:mt-0">
           Mis Estadísticas
         </h1>
       </motion.div>
 
       {/* MÉTRICAS */}
-      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-        <motion.div
-          className="bg-[#1A1A2E] rounded-xl p-5 shadow-lg border border-[#6C63FF30]"
-          whileHover={{ scale: 1.05 }}
-        >
-          <FaGamepad className="text-[#6C63FF] text-3xl mb-2" />
-          <h3 className="text-lg text-[#B0B3C2]">Total de juegos</h3>
-          <p className="text-3xl font-bold text-[#00E5FF]">
-            {estadisticas.totalJuegos}
-          </p>
-        </motion.div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+        <StatCard
+          icon={<FaGamepad className="text-[#6C63FF] text-3xl mb-2" />}
+          label="Total de juegos"
+          value={estadisticas.totalJuegos}
+          color="#00E5FF"
+        />
 
-        <motion.div
-          className="bg-[#1A1A2E] rounded-xl p-5 shadow-lg border border-[#6C63FF30]"
-          whileHover={{ scale: 1.05 }}
-        >
-          <FaTrophy className="text-[#00FF88] text-3xl mb-2" />
-          <h3 className="text-lg text-[#B0B3C2]">Completados</h3>
-          <p className="text-3xl font-bold text-[#00FF88]">
-            {estadisticas.porcentajeCompletados}%
-          </p>
-        </motion.div>
+        <StatCard
+          icon={<FaTrophy className="text-[#00FF88] text-3xl mb-2" />}
+          label="Completados"
+          value={`${estadisticas.porcentajeCompletados}%`}
+          color="#00FF88"
+        />
 
-        <motion.div
-          className="bg-[#1A1A2E] rounded-xl p-5 shadow-lg border border-[#6C63FF30]"
-          whileHover={{ scale: 1.05 }}
-        >
-          <FaStar className="text-[#FF4081] text-3xl mb-2" />
-          <h3 className="text-lg text-[#B0B3C2]">Promedio Puntuación</h3>
-          <p className="text-3xl font-bold text-[#FF4081]">
-            {estadisticas.promedioPuntuacion.toFixed(1)}
-          </p>
-        </motion.div>
+        <StatCard
+          icon={<FaStar className="text-[#FF4081] text-3xl mb-2" />}
+          label="Promedio Puntuación"
+          value={estadisticas.promedioPuntuacion.toFixed(1)}
+          color="#FF4081"
+        />
 
-        <motion.div
-          className="bg-[#1A1A2E] rounded-xl p-5 shadow-lg border border-[#6C63FF30]"
-          whileHover={{ scale: 1.05 }}
-        >
-          <FaChartBar className="text-[#00E5FF] text-3xl mb-2" />
-          <h3 className="text-lg text-[#B0B3C2]">Juegos Activos</h3>
-          <p className="text-3xl font-bold text-[#00E5FF]">
-            {estadisticas.totalJuegos - estadisticas.completados}
-          </p>
-        </motion.div>
+        <StatCard
+          icon={<FaChartBar className="text-[#00E5FF] text-3xl mb-2" />}
+          label="Juegos activos"
+          value={estadisticas.totalJuegos - estadisticas.completados}
+          color="#00E5FF"
+        />
       </div>
 
       {/* GRAFICAS */}
-      <div className="grid md:grid-cols-2 gap-10">
-        {/* Gráfico por plataforma */}
-        <div className="bg-[#1A1A2E] p-6 rounded-2xl shadow-lg border border-[#6C63FF30]">
-          <h2 className="text-xl mb-4 text-[#00E5FF] font-semibold">
-            Distribución por Plataforma
-          </h2>
-          <ResponsiveContainer width="100%" height={300}>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+        {/* Plataforma */}
+        <ChartCard title="Distribución por Plataforma">
+          <ResponsiveContainer width="100%" height={280}>
             <PieChart>
               <Pie
                 data={plataformasData}
                 dataKey="value"
                 nameKey="name"
-                outerRadius={100}
+                outerRadius={90}
               >
-                {plataformasData.map((entry, index) => (
-                  <Cell
-                    key={`cell-${index}`}
-                    fill={COLORS[index % COLORS.length]}
-                  />
+                {plataformasData.map((_, i) => (
+                  <Cell key={i} fill={COLORS[i % COLORS.length]} />
                 ))}
               </Pie>
               <Tooltip />
             </PieChart>
           </ResponsiveContainer>
-        </div>
+        </ChartCard>
 
-        {/* Gráfico por género */}
-        <div className="bg-[#1A1A2E] p-6 rounded-2xl shadow-lg border border-[#6C63FF30]">
-          <h2 className="text-xl mb-4 text-[#00E5FF] font-semibold">
-            Distribución por Género
-          </h2>
-          <ResponsiveContainer width="100%" height={300}>
+        {/* Género */}
+        <ChartCard title="Distribución por Género">
+          <ResponsiveContainer width="100%" height={280}>
             <BarChart data={generosData}>
               <CartesianGrid strokeDasharray="3 3" stroke="#2A2A40" />
               <XAxis dataKey="name" stroke="#B0B3C2" />
@@ -220,11 +184,34 @@ const Estadisticas = () => {
               <Bar dataKey="value" fill="#6C63FF" />
             </BarChart>
           </ResponsiveContainer>
-        </div>
+        </ChartCard>
       </div>
-      <Footer/>
+
+      <Footer />
     </div>
   );
 };
+
+// COMPONENTE DE MÉTRICA
+const StatCard = ({ icon, label, value, color }) => (
+  <motion.div
+    className="bg-[#1A1A2E] rounded-xl p-5 shadow-lg border border-[#6C63FF30]"
+    whileHover={{ scale: 1.05 }}
+  >
+    {icon}
+    <h3 className="text-lg text-[#B0B3C2]">{label}</h3>
+    <p className="text-3xl font-bold" style={{ color }}>
+      {value}
+    </p>
+  </motion.div>
+);
+
+// COMPONENTE DE GRÁFICAS
+const ChartCard = ({ children, title }) => (
+  <div className="bg-[#1A1A2E] p-6 rounded-2xl shadow-lg border border-[#6C63FF30]">
+    <h2 className="text-xl mb-4 text-[#00E5FF] font-semibold">{title}</h2>
+    {children}
+  </div>
+);
 
 export default Estadisticas;
