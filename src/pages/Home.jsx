@@ -61,8 +61,9 @@ const Home = () => {
         </h1>
 
         <p className="text-[#B0B3C2] mt-4 text-base sm:text-lg max-w-2xl leading-relaxed px-2">
-          Tu portal gamer definitivo ⚡ Administra tu biblioteca, revisa tus estadísticas,
-          gana medallas y compite con tus amigos. ¡Todo en un solo lugar!
+          Tu portal gamer definitivo ⚡Explora tus jugos favoritos, 
+          administra tu biblioteca, revisa tus estadísticas y
+         reseña tus juegos favoritos. ¡Todo en un solo lugar!
         </p>
       </motion.div>
 

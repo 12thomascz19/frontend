@@ -1,10 +1,16 @@
 import React, { useState } from "react";
+// Importo framer-motion para animaciones suaves
 import { motion } from "framer-motion";
+// Importo toast para mostrar notificaciones bonitas
 import toast from "react-hot-toast";
+// Importo axios para hacer peticiones HTTP
 import axios from "axios";
+// Importo íconos para botones
 import { FaTimes, FaSave } from "react-icons/fa";
 
-const AgregarJuegoModal = ({ onClose, onAdd }) => {
+// Componente para el modal de agregar un nuevo juego
+function AgregarJuegoModal({ onClose, onAdd }){
+  // Estado local para guardar la información del juego
   const [juego, setJuego] = useState({
     titulo: "",
     genero: "",
@@ -16,18 +22,23 @@ const AgregarJuegoModal = ({ onClose, onAdd }) => {
     completado: false,
   });
 
+  // Función que actualiza el estado cuando el usuario escribe en un input
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setJuego({
       ...juego,
-      [name]: type === "checkbox" ? checked : value,
+      [name]: type === "checkbox" ? checked : value, // Si es checkbox usamos checked
     });
   };
 
+  // Función que se ejecuta al enviar el formulario
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    e.preventDefault(); // Evito que la página se recargue
     try {
+      // Hago una petición POST al backend para agregar el juego
       await axios.post("http://localhost:5000/api/juegos", juego);
+
+      // Mostrar notificación de éxito
       toast.success("Juego agregado exitosamente 🎮", {
         style: {
           background: "#00FF88",
@@ -36,38 +47,46 @@ const AgregarJuegoModal = ({ onClose, onAdd }) => {
           fontWeight: "700",
         },
       });
+
+      // Llamo a la función onAdd para actualizar la lista de juegos
       onAdd();
+      // Cierro el modal
       onClose();
     } catch (error) {
       console.error("Error al agregar el juego:", error);
-      toast.error("No se pudo agregar el juego");
+      toast.error("No se pudo agregar el juego"); // Mostrar error si falla
     }
   };
 
   return (
+    // Fondo negro semi-transparente para el modal
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 backdrop-blur-sm"
     >
+      {/* Contenedor del modal con animación de escalado */}
       <motion.div
         initial={{ scale: 0.9 }}
         animate={{ scale: 1 }}
         className="bg-[#0A0A12] text-white p-6 rounded-2xl border border-[#00FF88] shadow-[0_0_25px_#00FF88] w-[90%] max-w-lg"
       >
+        {/* Header del modal con título y botón de cerrar */}
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-2xl font-bold text-[#00FF88] drop-shadow-[0_0_12px_#00FF88]">
             Agregar nuevo videojuego
           </h2>
           <button
-            onClick={onClose}
+            onClick={onClose} // Cierra el modal al hacer click
             className="text-[#FF4C7D] hover:text-[#FF1744]"
           >
             <FaTimes size={22} />
           </button>
         </div>
 
+        {/* Formulario para agregar juego */}
         <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Título */}
           <input
             type="text"
             name="titulo"
@@ -78,6 +97,7 @@ const AgregarJuegoModal = ({ onClose, onAdd }) => {
             className="w-full bg-[#161625] border border-[#00FF8840] rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#00FF88] outline-none"
           />
 
+          {/* Género y Plataforma */}
           <div className="grid grid-cols-2 gap-3">
             {/* Género */}
             <div>
@@ -132,6 +152,7 @@ const AgregarJuegoModal = ({ onClose, onAdd }) => {
             </div>
           </div>
 
+          {/* Año de lanzamiento y desarrollador */}
           <div className="grid grid-cols-2 gap-3">
             <input
               type="number"
@@ -153,6 +174,7 @@ const AgregarJuegoModal = ({ onClose, onAdd }) => {
             />
           </div>
 
+          {/* Imagen de portada */}
           <input
             type="text"
             name="imagenPortada"
@@ -163,6 +185,7 @@ const AgregarJuegoModal = ({ onClose, onAdd }) => {
             className="w-full bg-[#161625] border border-[#00FF8840] rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#00FF88]"
           />
 
+          {/* Descripción */}
           <textarea
             name="descripcion"
             value={juego.descripcion}
@@ -173,6 +196,7 @@ const AgregarJuegoModal = ({ onClose, onAdd }) => {
             className="w-full bg-[#161625] border border-[#00FF8840] rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#00FF88] resize-none"
           ></textarea>
 
+          {/* Checkbox completado */}
           <label className="flex items-center gap-2 text-sm text-[#C9C9D9]">
             <input
               type="checkbox"
@@ -184,6 +208,7 @@ const AgregarJuegoModal = ({ onClose, onAdd }) => {
             ¿Juego completado?
           </label>
 
+          {/* Botón guardar con animación hover */}
           <motion.button
             whileHover={{ scale: 1.05 }}
             type="submit"
@@ -198,4 +223,5 @@ const AgregarJuegoModal = ({ onClose, onAdd }) => {
   );
 };
 
+// Exporto el componente para usarlo en otros archivos
 export default AgregarJuegoModal;

@@ -1,5 +1,9 @@
 import React, { useState } from "react";
+// Importa React y el hook useState para manejar el estado local del formulario
+
 import { motion, AnimatePresence } from "framer-motion";
+// Importa Framer Motion para animaciones suaves de aparición/desaparición del modal
+
 import {
   FaTimes,
   FaUserAlt,
@@ -8,115 +12,148 @@ import {
   FaUserPlus,
   FaSpinner,
 } from "react-icons/fa";
-import axios from "axios";
-import toast from "react-hot-toast";
+// Importa íconos de Font Awesome: X para cerrar, usuario, sobre, candado, usuario + para registro, y spinner para carga
 
+import axios from "axios";
+// Axios para realizar peticiones HTTP al backend
+
+import toast from "react-hot-toast";
+// Para mostrar notificaciones emergentes (éxito o error)
+
+// Componente modal de registro
 const RegisterModal = ({ onClose }) => {
+  // onClose → función para cerrar el modal
+
   const [formData, setFormData] = useState({
     nombre: "",
     email: "",
     password: "",
   });
-  const [loading, setLoading] = useState(false);
+  // Estado para almacenar los datos del formulario: nombre, correo y contraseña
 
+  const [loading, setLoading] = useState(false);
+  // Estado para mostrar animación de carga mientras se registra
+
+  // Función para actualizar el estado cuando el usuario escribe en los inputs
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  // Función que se ejecuta al enviar el formulario
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
+    e.preventDefault(); // Evita que el formulario recargue la página
+    setLoading(true); // Activa animación de carga
 
     try {
+      // Petición POST al backend para registrar el usuario
       await axios.post("http://localhost:5000/api/auth/register", formData);
+
+      // Notificación de éxito
       toast.success("🎉 Registro exitoso. ¡Ahora inicia sesión!");
+
+      // Después de 1.5 segundos, desactiva loader y cierra el modal
       setTimeout(() => {
         setLoading(false);
         onClose();
       }, 1500);
     } catch (err) {
+      // Si ocurre un error, muestra notificación de error
       toast.error("❌ Error al registrarse. Verifica tus datos.");
-      setLoading(false);
+      setLoading(false); // Desactiva loader
     }
   };
 
   return (
     <AnimatePresence>
+      {/* Contenedor principal del modal con fondo oscuro y animación de fade */}
       <motion.div
         className="fixed inset-0 bg-black/70 backdrop-blur-sm flex justify-center items-center z-50"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
+        initial={{ opacity: 0 }} // Animación inicial: invisible
+        animate={{ opacity: 1 }} // Animación al aparecer: visible
+        exit={{ opacity: 0 }} // Animación al cerrar: fade out
       >
+        {/* Contenedor interno del modal con animación de escala */}
         <motion.div
-          initial={{ scale: 0.9, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          exit={{ scale: 0.9, opacity: 0 }}
-          transition={{ duration: 0.3 }}
+          initial={{ scale: 0.9, opacity: 0 }} // Inicia más pequeño y transparente
+          animate={{ scale: 1, opacity: 1 }} // Escala a tamaño normal y opacidad completa
+          exit={{ scale: 0.9, opacity: 0 }} // Al cerrar, vuelve a achicarse y desaparecer
+          transition={{ duration: 0.3 }} // Duración de la animación
           className="relative bg-[#1A1A2E] border border-[#6C63FF70] rounded-2xl shadow-2xl p-8 w-[90%] max-w-md text-white"
         >
-          {/* Botón de cerrar */}
+          {/* Botón para cerrar modal */}
           <button
-            onClick={onClose}
+            onClick={onClose} // Ejecuta función onClose al hacer click
             className="absolute top-3 right-3 text-gray-400 hover:text-[#FF4081] transition"
           >
-            <FaTimes size={20} />
+            <FaTimes size={20} /> {/* Ícono de X */}
           </button>
 
+          {/* Encabezado del modal */}
           <div className="text-center mb-6">
-            <FaUserPlus className="text-4xl mx-auto text-[#00E5FF] mb-2" />
+            <FaUserPlus className="text-4xl mx-auto text-[#00E5FF] mb-2" />{" "}
+            {/* Ícono grande de registro */}
             <h2 className="text-2xl font-bold text-[#00E5FF]">Crear Cuenta</h2>
             <p className="text-sm text-[#B0B3C2] mt-1">
               Regístrate y comienza tu aventura gamer 🚀
             </p>
           </div>
 
+          {/* Si está cargando, muestra loader */}
           {loading ? (
             <div className="flex flex-col items-center py-10">
-              <FaSpinner className="animate-spin text-[#00FF88] text-4xl mb-2" />
+              <FaSpinner className="animate-spin text-[#00FF88] text-4xl mb-2" />{" "}
+              {/* Spinner animado */}
               <p className="text-[#00FF88] font-semibold">Creando cuenta...</p>
             </div>
           ) : (
+            // Formulario de registro
             <form onSubmit={handleSubmit} className="space-y-5">
+              {/* Input de nombre */}
               <div className="relative">
-                <FaUserAlt className="absolute left-3 top-3 text-[#6C63FF]" />
+                <FaUserAlt className="absolute left-3 top-3 text-[#6C63FF]" />{" "}
+                {/* Ícono de usuario */}
                 <input
                   type="text"
                   name="nombre"
                   placeholder="Nombre completo"
                   value={formData.nombre}
-                  onChange={handleChange}
+                  onChange={handleChange} // Actualiza estado
                   required
                   className="w-full pl-10 pr-4 py-2 bg-[#0A0A12] border border-[#6C63FF70] rounded-lg text-white focus:ring-2 focus:ring-[#6C63FF] outline-none transition"
                 />
               </div>
 
+              {/* Input de email */}
               <div className="relative">
-                <FaEnvelope className="absolute left-3 top-3 text-[#6C63FF]" />
+                <FaEnvelope className="absolute left-3 top-3 text-[#6C63FF]" />{" "}
+                {/* Ícono de sobre */}
                 <input
                   type="email"
                   name="email"
                   placeholder="Correo electrónico"
                   value={formData.email}
-                  onChange={handleChange}
+                  onChange={handleChange} // Actualiza estado
                   required
                   className="w-full pl-10 pr-4 py-2 bg-[#0A0A12] border border-[#6C63FF70] rounded-lg text-white focus:ring-2 focus:ring-[#6C63FF] outline-none transition"
                 />
               </div>
 
+              {/* Input de contraseña */}
               <div className="relative">
-                <FaLock className="absolute left-3 top-3 text-[#6C63FF]" />
+                <FaLock className="absolute left-3 top-3 text-[#6C63FF]" />{" "}
+                {/* Ícono de candado */}
                 <input
                   type="password"
                   name="password"
                   placeholder="Contraseña"
                   value={formData.password}
-                  onChange={handleChange}
+                  onChange={handleChange} // Actualiza estado
                   required
                   className="w-full pl-10 pr-4 py-2 bg-[#0A0A12] border border-[#6C63FF70] rounded-lg text-white focus:ring-2 focus:ring-[#6C63FF] outline-none transition"
                 />
               </div>
 
+              {/* Botón de enviar formulario */}
               <button
                 type="submit"
                 className="w-full bg-gradient-to-r from-[#00E5FF] to-[#6C63FF] py-2 rounded-lg font-bold text-black shadow-lg hover:shadow-[#00E5FF]/50 transition-transform hover:scale-105"
