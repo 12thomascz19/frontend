@@ -1,43 +1,23 @@
 import React, { useState, useEffect } from "react";
-// React y hooks para manejar estado y efectos
-
 import { motion } from "framer-motion";
-// Animaciones suaves para la interfaz
-
 import axios from "axios";
-// Para hacer peticiones HTTP al backend
-
-import { FaSearch, FaFilter, FaGamepad, FaPlus } from "react-icons/fa";
-// Íconos usados en la interfaz
-
 import { useNavigate } from "react-router-dom";
-// Para navegar programáticamente entre páginas
-
 import toast from "react-hot-toast";
-// Notificaciones emergentes de éxito, error o info
-
-import CardBiblioteca from "../../components/Biblioteca/CardBiblioteca";
-// Componente de tarjeta de la biblioteca (si lo usas)
 
 import JuegoCard from "../../components/Juegos/JuegoCard";
-// Componente de tarjeta de juego
-
 import Footer from "../../components/Footer/Footer";
-// Footer de la página
 
-// Componente principal de la Biblioteca de Juegos
 const BibliotecaJuegos = () => {
   // Estados principales
   const [juegos, setJuegos] = useState([]); // Lista de juegos del usuario
   const [busqueda, setBusqueda] = useState(""); // Texto de búsqueda
-  const [genero, setGenero] = useState("todos"); // Filtro de género
-  const [loading, setLoading] = useState(false); // Estado de carga
-
-  const navigate = useNavigate(); // Hook para navegación programática
-  const token = localStorage.getItem("token"); // Token de sesión
+  const [genero, setGenero] = useState("todos"); // Filtro por género
+  const [loading, setLoading] = useState(false); // Estado de carga de acciones
+  const navigate = useNavigate(); // Para navegación programática
+  const token = localStorage.getItem("token"); // Token de autenticación
 
   // ----------------------------------
-  // 🔥 OBTENER BIBLIOTECA DEL USUARIO
+  // Función: Obtener biblioteca del usuario
   // ----------------------------------
   const obtenerBiblioteca = async () => {
     try {
@@ -48,26 +28,21 @@ const BibliotecaJuegos = () => {
 
       const data = res.data;
 
-      // Manejo flexible según el formato que envíe el backend
-      if (Array.isArray(data)) {
-        setJuegos(data);
-      } else if (Array.isArray(data?.biblioteca)) {
-        setJuegos(data.biblioteca);
-      } else if (Array.isArray(data?.juegos)) {
-        setJuegos(data.juegos);
-      } else {
+      // Validación flexible según estructura del backend
+      if (Array.isArray(data)) setJuegos(data);
+      else if (Array.isArray(data?.biblioteca)) setJuegos(data.biblioteca);
+      else if (Array.isArray(data?.juegos)) setJuegos(data.juegos);
+      else {
         setJuegos([]);
         toast.error("Formato inesperado al cargar tu biblioteca");
       }
     } catch (error) {
-      console.error("Error:", error);
+      console.error(error);
       setJuegos([]);
-
       if (error.response?.status === 401) {
-        // Sesión expirada
         toast.error("Sesión expirada. Inicia sesión de nuevo.");
         localStorage.removeItem("token");
-        window.location.href = "/";
+        navigate("/login");
       } else if (error.response?.status === 404) {
         toast.info("Tu biblioteca está vacía");
       } else {
@@ -82,8 +57,7 @@ const BibliotecaJuegos = () => {
   }, []);
 
   // ----------------------------------
-  // 🔥 TOGGLE COMPLETADO
-  // Cambia estado de completado de un juego
+  // Función: Cambiar estado de completado de un juego
   // ----------------------------------
   const toggleCompletado = async (juegoId, completadoActual) => {
     setLoading(true);
@@ -94,12 +68,10 @@ const BibliotecaJuegos = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      // Actualiza el juego en la lista local
+      // Actualiza el estado local
       setJuegos((prev) =>
-        prev.map((juego) =>
-          juego._id === juegoId
-            ? { ...juego, completado: response.data.completado }
-            : juego
+        prev.map((j) =>
+          j._id === juegoId ? { ...j, completado: response.data.completado } : j
         )
       );
 
@@ -109,7 +81,7 @@ const BibliotecaJuegos = () => {
           : "Juego marcado como pendiente"
       );
     } catch (error) {
-      console.error("Error:", error);
+      console.error(error);
       toast.error("No se pudo actualizar");
     } finally {
       setLoading(false);
@@ -117,23 +89,22 @@ const BibliotecaJuegos = () => {
   };
 
   // ----------------------------------
-  // 🔥 ELIMINAR JUEGO
+  // Función: Eliminar un juego de la biblioteca
   // ----------------------------------
   const eliminarJuego = async (juegoId) => {
     if (!window.confirm("¿Eliminar juego de tu biblioteca?")) return;
 
     setLoading(true);
     try {
-      await axios.delete(`http://localhost:5000/api/juegos/${juegoId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await axios.delete(
+        `http://localhost:5000/api/juegos/mi-biblioteca/${juegoId}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
 
-      // Quita el juego eliminado del estado
       setJuegos((prev) => prev.filter((j) => j._id !== juegoId));
-
       toast.success("Juego eliminado");
     } catch (error) {
-      console.error("Error:", error);
+      console.error(error);
       toast.error("No se pudo eliminar");
     } finally {
       setLoading(false);
@@ -141,7 +112,7 @@ const BibliotecaJuegos = () => {
   };
 
   // ----------------------------------
-  // 🔥 CALIFICAR JUEGO
+  // Función: Calificar un juego
   // ----------------------------------
   const calificarJuego = async (juegoId, nuevaCalificacion) => {
     setLoading(true);
@@ -152,7 +123,6 @@ const BibliotecaJuegos = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      // Actualiza la calificación en la lista local
       setJuegos((prev) =>
         prev.map((j) =>
           j._id === juegoId
@@ -163,7 +133,7 @@ const BibliotecaJuegos = () => {
 
       toast.success("Calificación actualizada");
     } catch (error) {
-      console.error("Error:", error);
+      console.error(error);
       toast.error("No se pudo calificar");
     } finally {
       setLoading(false);
@@ -171,7 +141,7 @@ const BibliotecaJuegos = () => {
   };
 
   // ----------------------------------
-  // 🔥 ESTADÍSTICAS
+  // Estadísticas de la biblioteca
   // ----------------------------------
   const estadisticas = {
     total: juegos.length,
@@ -185,7 +155,7 @@ const BibliotecaJuegos = () => {
   };
 
   // ----------------------------------
-  // 🔥 FILTRADO
+  // Filtrado de juegos por búsqueda y género
   // ----------------------------------
   const juegosFiltrados = juegos.filter((juego) => {
     const coincideTitulo = juego.titulo
@@ -197,79 +167,71 @@ const BibliotecaJuegos = () => {
     return coincideTitulo && coincideGenero;
   });
 
-  return (
-    <div className="min-h-screen bg-[#0A0A12] text-white px-6 pt-28 pb-16">
-      {/* ENCABEZADO */}
-      <div className="flex flex-col md:flex-row justify-between items-center mb-10">
-        {/* Título */}
-        <div className="flex items-center gap-3">
-          <FaGamepad className="text-[#6C63FF] text-4xl drop-shadow-[0_0_10px_#6C63FF]" />
-          <h1 className="text-3xl font-extrabold text-[#00E5FF] tracking-wide">
-            Mi Biblioteca
-          </h1>
-        </div>
+  // Función que se pasa a JuegoCard para actualizar la lista
+  const actualizarJuegos = (nuevaBiblioteca) => {
+    setJuegos(nuevaBiblioteca);
+  };
 
-        {/* ESTADÍSTICAS */}
-        <div className="flex gap-4 mt-6 md:mt-0">
-          <div className="bg-[#1A1A2E] border border-[#6C63FF40] rounded-lg px-4 py-2 text-center">
-            <p className="text-2xl font-bold text-[#00E5FF]">
+  return (
+    <div className="min-h-screen bg-[#0A0A12] text-white px-4 sm:px-6 lg:px-12 pt-28 pb-16">
+      {/* ENCABEZADO */}
+      <div className="flex flex-col lg:flex-row justify-between items-center mb-10 gap-6">
+        <h1 className="text-3xl lg:text-4xl font-bold text-cyan-400">
+          Mi Biblioteca
+        </h1>
+
+        {/* Estadísticas */}
+        <div className="flex flex-wrap gap-4">
+          <div className="bg-gray-800 border border-cyan-500 rounded-lg px-4 py-2 text-center min-w-[90px]">
+            <p className="text-2xl font-bold text-cyan-400">
               {estadisticas.total}
             </p>
-            <p className="text-xs text-[#B0B3C2]">Total Juegos</p>
+            <p className="text-xs text-gray-400">Total Juegos</p>
           </div>
-          <div className="bg-[#1A1A2E] border border-[#6C63FF40] rounded-lg px-4 py-2 text-center">
-            <p className="text-2xl font-bold text-[#00FF88]">
+          <div className="bg-gray-800 border border-green-500 rounded-lg px-4 py-2 text-center min-w-[90px]">
+            <p className="text-2xl font-bold text-green-400">
               {estadisticas.completados}
             </p>
-            <p className="text-xs text-[#B0B3C2]">Completados</p>
+            <p className="text-xs text-gray-400">Completados</p>
           </div>
-          <div className="bg-[#1A1A2E] border border-[#6C63FF40] rounded-lg px-4 py-2 text-center">
-            <p className="text-2xl font-bold text-[#FFD700]">
+          <div className="bg-gray-800 border border-yellow-500 rounded-lg px-4 py-2 text-center min-w-[90px]">
+            <p className="text-2xl font-bold text-yellow-400">
               {estadisticas.porcentajeCompletados}%
             </p>
-            <p className="text-xs text-[#B0B3C2]">Progreso</p>
+            <p className="text-xs text-gray-400">Progreso</p>
           </div>
         </div>
 
-        {/* FILTROS */}
-        <div className="flex flex-col md:flex-row items-center gap-4 mt-6 md:mt-0">
-          {/* Buscar por título */}
-          <div className="relative">
-            <FaSearch className="absolute left-3 top-3 text-[#6C63FF]" />
-            <input
-              type="text"
-              placeholder="Buscar por título..."
-              value={busqueda}
-              onChange={(e) => setBusqueda(e.target.value)}
-              className="bg-[#1A1A2E] border border-[#6C63FF60] rounded-lg pl-10 pr-4 py-2 text-sm"
-            />
-          </div>
-
-          {/* Filtrar por género */}
-          <div className="relative">
-            <FaFilter className="absolute left-3 top-3 text-[#6C63FF]" />
-            <select
-              className="bg-[#1A1A2E] border border-[#6C63FF60] rounded-lg pl-10 pr-4 py-2 text-sm"
-              value={genero}
-              onChange={(e) => setGenero(e.target.value)}
-            >
-              <option value="todos">Todos los géneros</option>
-              <option value="Acción">Acción</option>
-              <option value="Aventura">Aventura</option>
-              <option value="RPG">RPG</option>
-              <option value="Estrategia">Estrategia</option>
-              <option value="Deportes">Deportes</option>
-              <option value="Simulación">Simulación</option>
-              <option value="Puzzle">Puzzle</option>
-              <option value="Terror">Terror</option>
-            </select>
-          </div>
+        {/* Filtros */}
+        <div className="flex flex-col sm:flex-row gap-3">
+          <input
+            type="text"
+            placeholder="Buscar por título..."
+            value={busqueda}
+            onChange={(e) => setBusqueda(e.target.value)}
+            className="bg-gray-800 border border-cyan-500 rounded-lg px-4 py-2 text-sm w-full sm:w-auto"
+          />
+          <select
+            value={genero}
+            onChange={(e) => setGenero(e.target.value)}
+            className="bg-gray-800 border border-cyan-500 rounded-lg px-4 py-2 text-sm w-full sm:w-auto"
+          >
+            <option value="todos">Todos los géneros</option>
+            <option value="Acción">Acción</option>
+            <option value="Aventura">Aventura</option>
+            <option value="RPG">RPG</option>
+            <option value="Estrategia">Estrategia</option>
+            <option value="Deportes">Deportes</option>
+            <option value="Simulación">Simulación</option>
+            <option value="Puzzle">Puzzle</option>
+            <option value="Terror">Terror</option>
+          </select>
         </div>
       </div>
 
       {/* ACCIONES */}
-      <div className="flex justify-between items-center mb-6">
-        <p className="text-[#B0B3C2]">
+      <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-2">
+        <p className="text-gray-400 text-sm">
           Mostrando {juegosFiltrados.length} de {estadisticas.total} juegos
         </p>
 
@@ -279,42 +241,39 @@ const BibliotecaJuegos = () => {
               setBusqueda("");
               setGenero("todos");
             }}
-            className="bg-[#1A1A2E] border border-[#6C63FF40] px-4 py-2 rounded-lg text-sm"
+            className="bg-gray-800 border border-cyan-500 px-4 py-2 rounded-lg text-sm"
           >
             Limpiar Filtros
           </button>
+          <button
+            onClick={obtenerBiblioteca}
+            className="bg-gray-800 border border-cyan-500 px-4 py-2 rounded-lg text-sm"
+          >
+            Recargar
+          </button>
         </div>
-
-        <button
-          onClick={obtenerBiblioteca}
-          className="bg-[#1A1A2E] border border-[#6C63FF40] px-4 py-2 rounded-lg text-sm"
-        >
-          Recargar
-        </button>
       </div>
 
       {/* GRID DE JUEGOS */}
       {juegosFiltrados.length === 0 ? (
         <div className="text-center mt-10">
-          <p className="text-[#B0B3C2] mb-4">
-            No tienes juegos en tu biblioteca. 🎮
+          <p className="text-gray-400 mb-4">
+            No tienes juegos en tu biblioteca.
           </p>
-
           <button
             onClick={() => navigate("/explorar-juegos")}
-            className="bg-[#6C63FF] px-6 py-3 rounded-lg font-semibold"
+            className="bg-cyan-500 px-6 py-3 rounded-lg font-semibold text-black"
           >
             Explorar Juegos
           </button>
         </div>
       ) : (
         <motion.div
-          className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8"
+          className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5 }}
         >
-          {/* Renderizado de cada juego */}
           {juegosFiltrados.map((juego) => (
             <JuegoCard
               key={juego._id}
@@ -323,13 +282,14 @@ const BibliotecaJuegos = () => {
               toggleCompletado={toggleCompletado}
               eliminarJuego={eliminarJuego}
               calificarJuego={calificarJuego}
+              actualizarJuegos={actualizarJuegos}
             />
           ))}
         </motion.div>
       )}
 
       {/* FOOTER */}
-      <footer className="mt-20 pt-12 pb-10 text-sm border-t w-full">
+      <footer className="mt-20 pt-12 pb-10 text-sm border-t border-gray-700 w-full">
         <Footer />
       </footer>
     </div>

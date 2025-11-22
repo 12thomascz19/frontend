@@ -1,4 +1,3 @@
-// src/pages/VerReseñas/VerResenas.jsx
 
 import React, { useEffect, useState } from "react";
 import axios from "axios";
@@ -18,7 +17,7 @@ const VerResenas = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // 🔥 Si venimos desde edición, actualizar la card directamente
+  // Si venimos desde edición, actualizar la card directamente
   useEffect(() => {
     const reseñaActualizada = location.state?.reseñaActualizada;
 
@@ -49,7 +48,7 @@ const VerResenas = () => {
     fetchResenas();
   }, []);
 
-  // 🔥 Eliminar reseña desde modal
+  // Eliminar reseña desde modal
   const eliminarResena = async () => {
     if (!resenaSeleccionada) return;
 

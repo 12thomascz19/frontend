@@ -47,11 +47,11 @@ const ResenaCard = ({ resena, onEdit, onDelete }) => {
   const esPropietario = user?.id === autorId || user?._id === autorId;
 
   // ----------------------------------
-  // 🔥 FUNCION ELIMINAR RESEÑA
+  //  FUNCION ELIMINAR RESEÑA
   // ----------------------------------
   const eliminarResena = async () => {
     if (!esPropietario) {
-      toast.error("❌ No puedes eliminar reseñas de otros usuarios.");
+      toast.error("No puedes eliminar reseñas de otros usuarios.");
       setMenuOpen(false);
       return;
     }
